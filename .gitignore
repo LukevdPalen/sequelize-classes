@@ -29,8 +29,5 @@ node_modules
 # Webstorm .idea
 .idea
 
-# Ignore our lib folder
-lib
-
 .env
 .env.development
