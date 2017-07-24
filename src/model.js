@@ -165,19 +165,26 @@ export class Model {
    * @returns {Model}
    */
   registerModel(sequelize) {
-    const model = sequelize.define(this.constructor.name, this._fields, {
-      instanceMethods: this._instanceMethods,
-      indexes: this._indexes,
-      classMethods: this._classMethods,
-      getterMethods: this._getterMethods,
-      setterMethods: this._setterMethods,
-      validate: this._validate,
-      ...this.constructor._options
+    const self = this;
+    const Model = sequelize.define(self.constructor.name, self._fields, {
+      indexes: self._indexes,
+      getterMethods: self._getterMethods,
+      setterMethods: self._setterMethods,
+      validate: self._validate,
+      ...self.constructor._options
     });
 
-    this.declareHooks(model);
+    Object.keys(self._classMethods).forEach(key => {
+      Model[key] = self._classMethods[key];
+    },self);
+
+    Object.keys(self._instanceMethods).forEach(key => {
+      Model.prototype[key] = self._instanceMethods[key];
+    }, self);
+
+    this.declareHooks(Model);
     // this.declareRelations( model, sequelize );
-    return model;
+    return Model;
   }
 
   declareRelations(model, sequelize) {
